@@ -16,7 +16,8 @@ pipeline {
 stage('Deploy to Kubernetes') {
     steps {
         bat '''
-        set KUBECONFIG=%USERPROFILE%\\.kube\\config
+        set KUBECONFIG=C:\\Users\\Debasish\\.kube\\config
+        kubectl get nodes
         kubectl delete deployment my-html --ignore-not-found
         kubectl create deployment my-html --image=my-html-app
         '''

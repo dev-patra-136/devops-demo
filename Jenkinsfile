@@ -16,6 +16,17 @@ pipeline {
             }
         }
 
+        stage('Check Login') {
+    steps {
+        withCredentials([usernamePassword(credentialsId: 'docker-creds', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+            bat '''
+            echo Logging in...
+            echo %PASS% | docker login -u %USER% --password-stdin
+            '''
+        }
+    }
+}
+
         stage('Login & Push to Docker Hub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker-creds', usernameVariable: 'USER', passwordVariable: 'PASS')]) {

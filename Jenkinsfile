@@ -2,7 +2,9 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "devpatra136/my-html-app"
+        DOCKERHUB_USER = "devpatra136"
+        IMAGE_NAME = "my-html-app"
+        FULL_IMAGE = "${DOCKERHUB_USER}/${IMAGE_NAME}:latest"
         KUBECONFIG_PATH = "C:\\Users\\Debasish\\.kube\\config"
     }
 
@@ -10,7 +12,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t %IMAGE_NAME%:latest .'
+                bat "docker build -t %FULL_IMAGE% ."
             }
         }
 
@@ -19,7 +21,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'docker-creds', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                     bat '''
                     echo %PASS% | docker login -u %USER% --password-stdin
-                    docker push %IMAGE_NAME%:latest
+                    docker push %FULL_IMAGE%
                     '''
                 }
             }
@@ -29,8 +31,10 @@ pipeline {
             steps {
                 bat '''
                 set KUBECONFIG=%KUBECONFIG_PATH%
+
                 kubectl delete deployment my-html --ignore-not-found
-                kubectl create deployment my-html --image=%IMAGE_NAME%:latest
+
+                kubectl create deployment my-html --image=%FULL_IMAGE%
                 '''
             }
         }
@@ -39,7 +43,9 @@ pipeline {
             steps {
                 bat '''
                 set KUBECONFIG=%KUBECONFIG_PATH%
+
                 kubectl delete svc my-html --ignore-not-found
+
                 kubectl expose deployment my-html --type=NodePort --port=80
                 '''
             }

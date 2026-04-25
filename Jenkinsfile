@@ -13,14 +13,15 @@ pipeline {
             }
         }
 
-        stage('Deploy to Kubernetes') {
-            steps {
-                bat '''
-                kubectl delete deployment my-html --ignore-not-found
-                kubectl create deployment my-html --image=%IMAGE_NAME%
-                '''
-            }
-        }
+stage('Deploy to Kubernetes') {
+    steps {
+        bat '''
+        set KUBECONFIG=%USERPROFILE%\\.kube\\config
+        kubectl delete deployment my-html --ignore-not-found
+        kubectl create deployment my-html --image=my-html-app
+        '''
+    }
+}
 
         stage('Expose Service') {
             steps {

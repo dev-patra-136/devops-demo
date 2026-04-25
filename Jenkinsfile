@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "my-html-app"
+        KUBECONFIG_PATH = "C:\\Users\\Debasish\\.kube\\config"
     }
 
     stages {
@@ -13,20 +14,21 @@ pipeline {
             }
         }
 
-stage('Deploy to Kubernetes') {
-    steps {
-        bat '''
-        set KUBECONFIG=C:\\Users\\Debasish\\.kube\\config
-        kubectl get nodes
-        kubectl delete deployment my-html --ignore-not-found
-        kubectl create deployment my-html --image=my-html-app
-        '''
-    }
-}
+        stage('Deploy to Kubernetes') {
+            steps {
+                bat '''
+                set KUBECONFIG=%KUBECONFIG_PATH%
+                kubectl get nodes
+                kubectl delete deployment my-html --ignore-not-found
+                kubectl create deployment my-html --image=%IMAGE_NAME%
+                '''
+            }
+        }
 
         stage('Expose Service') {
             steps {
                 bat '''
+                set KUBECONFIG=%KUBECONFIG_PATH%
                 kubectl delete svc my-html --ignore-not-found
                 kubectl expose deployment my-html --type=NodePort --port=80
                 '''

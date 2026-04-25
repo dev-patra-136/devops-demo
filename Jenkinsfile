@@ -27,16 +27,16 @@ pipeline {
     }
 }
 
-        stage('Login & Push to Docker Hub') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-creds', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                    bat '''
-                    echo %PASS% | docker login -u %USER% --password-stdin
-                    docker push %FULL_IMAGE%
-                    '''
-                }
-            }
+stage('Login & Push to Docker Hub') {
+    steps {
+        withCredentials([usernamePassword(credentialsId: 'docker-creds', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+            bat '''
+            docker login -u %USER% -p %PASS%
+            docker push devpatra136/my-html-app:latest
+            '''
         }
+    }
+}
 
         stage('Deploy to Kubernetes') {
             steps {
